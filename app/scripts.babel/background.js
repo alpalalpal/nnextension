@@ -1,8 +1,10 @@
 'use strict';
 
 chrome.runtime.onInstalled.addListener(onInstalled);
+chrome.webRequest.onBeforeRequest.addListener(onBeforeRequest, {urls: ['<all_urls>']});
+chrome.webRequest.onCompleted.addListener(onComplete, {urls: ['<all_urls>']});
 
-const pages = [];
+const requests = [];
 
 function onInstalled(details) {
   console.log(details);
@@ -10,6 +12,12 @@ function onInstalled(details) {
   // chrome.storage.local.set(object items, function callback);
 }
 
-function onTabOpen(tab) {
-  pages.push(new UrlListener(tab));
+function onBeforeRequest(details){
+  console.log('request start: ',details);
+  requests.push(details);
 }
+
+function onComplete(details) { // https://developer.chrome.com/extensions/webRequest#event-onCompleted
+  console.log('done with' ,details);
+}
+
