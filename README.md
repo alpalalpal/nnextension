@@ -12,8 +12,12 @@ to install:
 * npm install
 
 ## to watch & transpile:
-gulp watch 
+gulp watch
 ### to test go to chrome://extensions/, enable developer mode, and add unpacked extension. select the "app" folder.
 
 ## Make a production version extension
 gulp build
+
+## Protocol specifications
+
+[PROTOCOL.md](../PROTOCOL.md)
