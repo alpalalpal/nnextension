@@ -20,6 +20,6 @@
     "pageCapture",
     "webNavigation",
     "webRequest",
-    "*://*.google.com/"
+    "*://*/"
   ]
 }

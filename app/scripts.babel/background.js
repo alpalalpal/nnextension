@@ -21,3 +21,18 @@ function onComplete(details) { // https://developer.chrome.com/extensions/webReq
   console.log('done with' ,details);
 }
 
+/*
+* example of details object captured in onBeforeRequest and onComplete:
+frameId: 0
+initiator: "https://www.vg.no"
+method: "GET"
+parentFrameId: -1
+requestId: "70160"
+tabId: 664
+timeStamp: 1515654956345.388
+type: "xmlhttprequest"
+url: "https://direkte.vg.no/feed-module/536f61035152f7314000007e/verbatim/since/1515654740000?types=vgtv,text,article,twitter,photo&limit=2
+
+Seems like we cannot see size of request yet
+* */
+
