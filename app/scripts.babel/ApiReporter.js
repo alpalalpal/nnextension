@@ -1,4 +1,4 @@
-const API = 'http://server.no';
+const API = 'https://server.io';
 
 class ApiReporter {
 
@@ -7,7 +7,7 @@ class ApiReporter {
   }
 
   send() {
-    return fetch(this.getUrl(), ApiReporter.getOptions());
+    return fetch(ApiReporter.getUrl(), ApiReporter.getOptions());
   }
 
   static getUrl(endpoint = '') {
