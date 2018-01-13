@@ -87,7 +87,8 @@ gulp.task('chromeManifest', () => {
 gulp.task('babel', () => {
   return gulp.src('app/scripts.babel/**/*.js')
       .pipe($.babel({
-        presets: ['es2015']
+        presets: ['env'],
+        plugins: ["transform-es2015-spread", "transform-object-rest-spread"]
       }))
       .pipe(gulp.dest('app/scripts'));
 });

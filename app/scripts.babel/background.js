@@ -3,8 +3,7 @@
 chrome.runtime.onInstalled.addListener(onInstalled);
 chrome.webRequest.onBeforeRequest.addListener(onBeforeRequest, {urls: ['<all_urls>']});
 chrome.webRequest.onCompleted.addListener(onComplete, {urls: ['<all_urls>']});
-
-const requests = [];
+chrome.webRequest.onBeforeSendHeaders.addListener(onBeforeSendHeaders);
 
 function onInstalled(details) {
   console.log(details);
@@ -14,13 +13,20 @@ function onInstalled(details) {
 
 function onBeforeRequest(details){
   console.log('request start: ',details);
-  requests.push(details);
 }
 
 function onComplete(details) { // https://developer.chrome.com/extensions/webRequest#event-onCompleted
   console.log('done with' ,details);
 }
 
+function onBeforeSendHeaders(details){
+  debugger;
+}
+
+function reportData(request) {
+  const reporter = new ApiReporter(request);
+  return reporter.send();
+}
 /*
 * example of details object captured in onBeforeRequest and onComplete:
 frameId: 0
