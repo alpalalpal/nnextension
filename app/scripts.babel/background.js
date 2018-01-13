@@ -1,38 +1,72 @@
 'use strict';
 
+/**
+ *  Background.js will register events on the different pages request lifecycle. https://developer.chrome.com/extensions/webRequest
+ *  - The onComplete event has details about the time the request used, the headers have the size
+ *  - Use ApiReporter to send data to our API.
+ */
+
 chrome.runtime.onInstalled.addListener(onInstalled);
-chrome.webRequest.onBeforeRequest.addListener(onBeforeRequest, {urls: ['<all_urls>']});
-chrome.webRequest.onCompleted.addListener(onComplete, {urls: ['<all_urls>']});
 
-const requests = [];
+// Request lifecycle events
+chrome.webRequest.onBeforeRequest.addListener(onBeforeRequest, { urls: ['<all_urls>'] });
+chrome.webRequest.onCompleted.addListener(onComplete, { urls: ['<all_urls>'] });
+chrome.webRequest.onHeadersReceived.addListener(onHeadersReceived, { urls: ['<all_urls>'] }, ["responseHeaders"]);
 
+const requests = {};
+
+// Should maybe assign the user a token from API here.
 function onInstalled(details) {
   console.log(details);
-  // Possibly contact API to set-up account?
-  // chrome.storage.local.set(object items, function callback);
 }
 
-function onBeforeRequest(details){
-  console.log('request start: ',details);
-  requests.push(details);
+function onBeforeRequest(details) {
+  console.log('onBeforeRequest ', details);
+  setRequestData(details.url, 'start', details);
 }
 
 function onComplete(details) { // https://developer.chrome.com/extensions/webRequest#event-onCompleted
-  console.log('done with' ,details);
+  console.log('onComplete', details);
+  if (details.fromCache === false) {
+    setRequestData(details.url, 'end', details);
+    reportData({
+      speed: getRequestSpeed(details.url)
+    });
+  }
+  delete details[details.url];
 }
 
-/*
-* example of details object captured in onBeforeRequest and onComplete:
-frameId: 0
-initiator: "https://www.vg.no"
-method: "GET"
-parentFrameId: -1
-requestId: "70160"
-tabId: 664
-timeStamp: 1515654956345.388
-type: "xmlhttprequest"
-url: "https://direkte.vg.no/feed-module/536f61035152f7314000007e/verbatim/since/1515654740000?types=vgtv,text,article,twitter,photo&limit=2
+function onHeadersReceived(details) { // https://developer.chrome.com/extensions/webRequest#event-onHeadersReceived
+  console.log('onHeadersReceived', details);
+  setRequestData(details.url, 'headers', details);
+}
 
-Seems like we cannot see size of request yet
-* */
+function reportData(request) {
+  const reporter = new ApiReporter(request);
+  // return reporter.send();
+}
 
+function setRequestData(url, name, data) {
+  const request = requests[url] ? requests[url] : (requests[url] = {});
+  request[name] = data;
+  return request;
+}
+
+function getRequestSpeed(url) {
+  const request = requests[url];
+
+  if (request) {
+    const regexp = /content-length/i;
+
+    const start = request.start.timeStamp;
+    const end = request.end.timeStamp;
+    const time = end - start; // milliseconds
+
+    const sizeHeader = request.headers.responseHeaders.find((headerItem) => regexp.test(headerItem['name']));
+    const size = Number(sizeHeader['value']);
+
+    const speed = (size * 8) / time; // Todo: Fix this.
+
+    console.log('speed bit/millisecond', speed);
+  }
+}

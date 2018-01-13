@@ -12,7 +12,7 @@
     "scripts": [
       "scripts/chromereload.js",
       "scripts/background.js",
-      "scripts/UrlListener.js"
+      "scripts/ApiReporter.js"
     ]
   },
   "permissions": [
